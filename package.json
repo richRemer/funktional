@@ -1,0 +1,23 @@
+{
+  "name": "funktional",
+  "version": "0.0.1",
+  "description": "Function composition helpers",
+  "main": "funktional.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "mocha": "^2",
+    "sinon": "^1",
+    "expect.js": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/richRemer/funktional.git"
+  },
+  "author": "Richard Remer (reanjr@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/richRemer/funktional/issues"
+  }
+}
