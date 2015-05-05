@@ -72,6 +72,7 @@ function bucket(stream, done) {
 
 /** export functions */
 module.exports = {
+    bucket: bucket,
     once: once,
-    bucket: bucket
+    pusher: pusher
 };

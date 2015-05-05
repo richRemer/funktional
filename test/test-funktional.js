@@ -3,20 +3,6 @@ var Readable = require("stream").Readable,
     sinon = require("sinon"),
     fn = require("..");
 
-describe("once", function() {
-    describe("(function)", function() {
-        it("should only execute on first call", function() {
-            var spy = sinon.spy(),
-                onceFn = fn.once(spy);
-
-            onceFn();
-            onceFn();
-
-            expect(spy.calledOnce).to.be(true);
-        });
-    });
-});
-
 describe("bucket", function() {
     function createStream() {
         var chunks = ["foo", "bar"];
@@ -48,6 +34,34 @@ describe("bucket", function() {
                     done();
                 }
             });
+        });
+    });
+});
+
+describe("once", function() {
+    describe("(function)", function() {
+        it("should only execute on first call", function() {
+            var spy = sinon.spy(),
+                onceFn = fn.once(spy);
+
+            onceFn();
+            onceFn();
+
+            expect(spy.calledOnce).to.be(true);
+        });
+    });
+});
+
+describe("pusher", function() {
+    describe("(array)", function() {
+        it("should add arguments to array", function() {
+            var arr = [0],
+                pusher = fn.pusher(arr);
+
+            pusher(1, 2);
+            expect(arr.length).to.be(3);
+            expect(arr[1]).to.be(1);
+            expect(arr[2]).to.be(2);
         });
     });
 });

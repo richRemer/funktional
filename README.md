@@ -16,15 +16,17 @@ send("bar");    // does nothing
 Helper Functions
 ----------------
 
-### once(function)
+### bucket(stream.Readable, [function])
+Read an entire stream, then pass the result to the callback.  Alternatively,
+return a Promise for the stream result.
 
+### once(function)
 Return a new function which calls the provided function the first time only.
 Subsequent calls to the new function will do nothing but return the original
 result.
 
-### bucket(stream.Readable, [function])
-Read an entire stream, then pass the result to the callback.  Alternatively,
-return a Promise for the stream result.
+### pusher(array)
+Return a function which pushes its arguments onto an array.
 
 Appendix: Async Callback Styles
 -------------------------------
