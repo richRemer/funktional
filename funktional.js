@@ -159,6 +159,7 @@ function unshifter(arr) {
 
 /** export functions */
 module.exports = {
+    ok: ok,
     once: once,
     pledge: pledge,
 

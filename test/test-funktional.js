@@ -4,6 +4,19 @@ var Readable = require("stream").Readable,
     sinon = require("sinon"),
     fn = require("..");
 
+describe("ok", function() {
+    describe("(function)", function() {
+        it("should always pass null as first argument", function(done) {
+            fn.ok(function(err, a, b) {
+                expect(err).to.be(null);
+                expect(a).to.be(42);
+                expect(b).to.be(13);
+                done();
+            })(42, 13);
+        });
+    });
+});
+
 describe("once", function() {
     describe("(function)", function() {
         it("should only execute on first call", function() {

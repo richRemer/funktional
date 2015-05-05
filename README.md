@@ -20,6 +20,9 @@ Helper Functions
 Read an entire stream, then pass the result to the callback.  Alternatively,
 return a Promise for the stream result.
 
+### ok(function)
+Return a new function that injects a null as the first argument.
+
 ### once(function)
 Return a new function which calls the provided function the first time only.
 Subsequent calls to the new function will do nothing but return the original
