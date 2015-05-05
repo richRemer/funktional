@@ -9,7 +9,8 @@
   "devDependencies": {
     "mocha": "^2",
     "sinon": "^1",
-    "expect.js": "*"
+    "expect.js": "*",
+    "es6-promise": "^2"
   },
   "repository": {
     "type": "git",

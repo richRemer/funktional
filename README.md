@@ -16,18 +16,21 @@ send("bar");    // does nothing
 Helper Functions
 ----------------
 
-### once(function) -> function
-Wrap the function so that it can only be called once.
+### once(function)
 
-### continues(EventEmitter, string) -> function
-Wrap an EventEmitter, returning a function in continuation passing style which
-waits for a named event before passing the event arguments to the callback, or
-in case of error, passes the error to the callback.
+Return a new function which calls the provided function the first time only.
+Subsequent calls to the new function will do nothing but return the original
+result.
 
-Appendix: Async Call Transforms
+### bucket(stream.Readable, [function])
+Read an entire stream, then pass the result to the callback.  Alternatively,
+return a Promise for the stream result.
+
+Appendix: Async Callback Styles
 -------------------------------
 There are three common asynchronous patterns used in node.  The `funktional`
-module has helpers for wrapping different styles.
+module has helpers for wrapping the different styles: continuation passing,
+promises, or events.  These are described here.
 
 ### Continuation Passing
 In the typical node.js continuation passing style, an asynchronous function
