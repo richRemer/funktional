@@ -25,8 +25,17 @@ Return a new function which calls the provided function the first time only.
 Subsequent calls to the new function will do nothing but return the original
 result.
 
+### popper(array)
+Return a function which pops values from the end of an array.
+
 ### pusher(array)
-Return a function which pushes its arguments onto an array.
+Return a function which pushes its arguments onto the end of an array.
+
+### shifter(array)
+Return a function which shifts values from the start of an array.
+
+### unshifter(array)
+Return a function which unshifts its arguments onto the start of an array.
 
 Appendix: Async Callback Styles
 -------------------------------
