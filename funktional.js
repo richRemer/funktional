@@ -26,9 +26,7 @@ function once(fn) {
  * @returns {function}
  */
 function pusher(arr) {
-    return function() {
-        Array.prototype.push.apply(arr, arguments);
-    };
+    return Array.prototype.push.bind(arr);
 }
 
 /**
