@@ -1,35 +1,6 @@
 var Promise = require("es6-promise").Promise;
 
 /**
- * Create updated function which only executes the first time it is called.
- * The new function will always return the same result.
- * @param {function}
- * @returns {function}
- */
-function once(fn) {
-    var called = false,
-        result;
-
-    return function() {
-        if (!called) {
-            result = fn.apply(this, arguments);
-            called = true;
-        }
-
-        return result;
-    };
-}
-
-/**
- * Create function which pushes its arguments onto an array.
- * @param {array} arr
- * @returns {function}
- */
-function pusher(arr) {
-    return Array.prototype.push.bind(arr);
-}
-
-/**
  *
  * @param {Readable} stream
  * @param {function} [done]
@@ -68,9 +39,73 @@ function bucket(stream, done) {
     return result;
 }
 
+/**
+ * Create updated function which only executes the first time it is called.
+ * The new function will always return the same result.
+ * @param {function}
+ * @returns {function}
+ */
+function once(fn) {
+    var called = false,
+        result;
+
+    return function() {
+        if (!called) {
+            result = fn.apply(this, arguments);
+            called = true;
+        }
+
+        return result;
+    };
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Array function binding
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Create function which pops values from an array.
+ * @param {array} arr
+ * @returns {function}
+ */
+function popper(arr) {
+    return Array.prototype.pop.bind(arr);
+}
+
+/**
+ * Create function which pushes its arguments onto an array.
+ * @param {array} arr
+ * @returns {function}
+ */
+function pusher(arr) {
+    return Array.prototype.push.bind(arr);
+}
+
+/**
+ * Create function which shifts values from an array.
+ * @param {array} arr
+ * @returns {function}
+ */
+function shifter(arr) {
+    return Array.prototype.shift.bind(arr);
+}
+
+/**
+ * Create function which unshifts its arguments onto an array.
+ * @param {array} arr
+ * @returns {function}
+ */
+function unshifter(arr) {
+    return Array.prototype.unshift.bind(arr);
+}
+
 /** export functions */
 module.exports = {
     bucket: bucket,
     once: once,
-    pusher: pusher
+
+    popper: popper,
+    pusher: pusher,
+    shifter: shifter,
+    unshifter: unshifter
 };
