@@ -18,6 +18,24 @@ describe("once", function() {
     });
 });
 
+describe("pledge", function() {
+    describe("(function)", function() {
+        it("should make callback optional; Promise instead", function(done) {
+            var callback = function(a, b, done) {
+                    done(null, a, b);
+                },
+                pledge = fn.pledge(callback),
+                promise = pledge(42, 13);
+
+            promise.then(function(result) {
+                expect(arguments.length).to.be(1);
+                expect(result).to.be(42);
+                done();
+            }).catch(done);
+        });
+    });
+});
+
 describe("bucket", function() {
     function createStream() {
         var chunks = ["foo", "bar"];
@@ -64,10 +82,7 @@ describe("supervise", function() {
 
             expect(supervise.then).to.be.a("function");
             supervise.then(function(result) {
-                expect(result).to.be.an("object");
-                expect(result.exit).to.be.a("number");
-                expect(result.stdout).to.be.a(Buffer);
-                expect(result.stderr).to.be.a(Buffer);
+                expect(result).to.be.a("number");
                 done();
             }).catch(done);
         });

@@ -25,6 +25,10 @@ Return a new function which calls the provided function the first time only.
 Subsequent calls to the new function will do nothing but return the original
 result.
 
+### pledge(function)
+Return a new function with optional callback; if callback is not provided, the
+new function will return a Promise.
+
 ### popper(array)
 Return a function which pops values from the end of an array.
 

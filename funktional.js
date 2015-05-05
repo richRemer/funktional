@@ -35,6 +35,34 @@ function once(fn) {
     };
 }
 
+/**
+ * Create updated function with the callback optional.  If the callback is not
+ * provided, the function will return a Promise.
+ * @param {function} fn
+ * @returns {function}
+ */
+function pledge(fn) {
+    return function() {
+        var resolver, rejecter,
+            result;
+
+        if (typeof arguments[arguments.length-1] !== "function") {
+            result = new Promise(function(resolve, reject) {
+                resolver = resolve;
+                rejecter = reject;
+            });
+
+            Array.prototype.push.call(arguments, function(err, result) {
+                if (err) rejecter(err);
+                else resolver(result);
+            });
+        }
+
+        fn.apply(this, arguments);
+        return result;
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // Specialized event handlers
 //////////////////////////////////////////////////////////////////////////////
@@ -46,21 +74,8 @@ function once(fn) {
  * @param {function} [done]
  * @returns {Promise}
  */
-function bucket(stream, done) {
-    var bucket = [],
-        result;
-
-    // set result to Promise if no callback provided
-    if (!done) {
-        // create a Promise result
-        result = new Promise(function(resolve, reject) {
-            // setup missing callback to resolve promised result
-            done = function(err, result) {
-                if (err) reject(err);
-                else resolve(result);
-            };
-        });
-    }
+var bucket = pledge(function(stream, done) {
+    var bucket = [];
 
     // read the stream and pass results to callback
     stream.on("error", done);
@@ -74,10 +89,7 @@ function bucket(stream, done) {
 
         done(null, strings ? bucket.join("") : bucket);
     });
-
-    // return promised result
-    return result;
-}
+});
 
 /**
  * Supervise a ChildProcess and pass results to callback or return results as
@@ -86,29 +98,9 @@ function bucket(stream, done) {
  * @param {function} [done]
  * @returns {Promise}
  */
-function supervise(proc, done) {
-    var result, resolver, rejecter,
-        output = [],
+var supervise = pledge(function(proc, done) {
+    var output = [],
         error = [];
-
-    // set result to Promise if no callback provided
-    if (!done) {
-        // create new done to resolve Promise
-        done = function(err, code, stdout, stderr) {
-            if (err) rejecter(err);
-            else resolver({
-                exit: code,
-                stdout: stdout,
-                stderr: stderr
-            });
-        };
-
-        // create a Promise result
-        result = new Promise(function(resolve, reject) {
-            resolver = resolve;
-            rejecter = reject;
-        });
-    }
 
     // ChildProcess may emit "error", "close", or both; ensure single done call
     done = once(done);
@@ -122,10 +114,7 @@ function supervise(proc, done) {
     proc.on("close", function(code) {
         done(null, code, Buffer.concat(output), Buffer.concat(error));
     });
-
-    // return promised result
-    return result;
-}
+});
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -170,8 +159,10 @@ function unshifter(arr) {
 
 /** export functions */
 module.exports = {
-    bucket: bucket,
     once: once,
+    pledge: pledge,
+
+    bucket: bucket,
     supervise: supervise,
 
     popper: popper,
