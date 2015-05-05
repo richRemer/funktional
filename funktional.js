@@ -1,7 +1,47 @@
 var Promise = require("es6-promise").Promise;
 
+//////////////////////////////////////////////////////////////////////////////
+// Utility wrappers
+//////////////////////////////////////////////////////////////////////////////
+
 /**
- *
+ * Create updated function which always passes null as its first argument.  As
+ * this is typically the error argument, this has the effect of turning the
+ * function into an always successful result.
+ * @param {function} fn
+ * @returns {function}
+ */
+function ok(fn) {
+    return fn.bind(null, null);
+}
+
+/**
+ * Create updated function which only executes the first time it is called.
+ * The new function will always return the same result.
+ * @param {function} fn
+ * @returns {function}
+ */
+function once(fn) {
+    var called = false,
+        result;
+
+    return function() {
+        if (!called) {
+            result = fn.apply(this, arguments);
+            called = true;
+        }
+
+        return result;
+    };
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Specialized event handlers
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Consume Readable stream and pass result to callback or return as a Promise
+ * if no callback is provided.
  * @param {Readable} stream
  * @param {function} [done]
  * @returns {Promise}
@@ -10,7 +50,7 @@ function bucket(stream, done) {
     var bucket = [],
         result;
 
-    // bucket result differs based on whether callback is provided
+    // set result to Promise if no callback provided
     if (!done) {
         // create a Promise result
         result = new Promise(function(resolve, reject) {
@@ -40,24 +80,53 @@ function bucket(stream, done) {
 }
 
 /**
- * Create updated function which only executes the first time it is called.
- * The new function will always return the same result.
- * @param {function}
- * @returns {function}
+ * Supervise a ChildProcess and pass results to callback or return results as
+ * a Promise if no callback is provided.
+ * @param {ChildProcess} proc
+ * @param {function} [done]
+ * @returns {Promise}
  */
-function once(fn) {
-    var called = false,
-        result;
+function supervise(proc, done) {
+    var result, resolver, rejecter,
+        output = [],
+        error = [];
 
-    return function() {
-        if (!called) {
-            result = fn.apply(this, arguments);
-            called = true;
-        }
+    // set result to Promise if no callback provided
+    if (!done) {
+        // create new done to resolve Promise
+        done = function(err, code, stdout, stderr) {
+            if (err) rejecter(err);
+            else resolver({
+                exit: code,
+                stdout: stdout,
+                stderr: stderr
+            });
+        };
 
-        return result;
-    };
+        // create a Promise result
+        result = new Promise(function(resolve, reject) {
+            resolver = resolve;
+            rejecter = reject;
+        });
+    }
+
+    // ChildProcess may emit "error", "close", or both; ensure single done call
+    done = once(done);
+
+    // collect buffered output
+    proc.stdout.on("data", pusher(output));
+    proc.stderr.on("data", pusher(error));
+
+    // handle process and pass execution results to callback
+    proc.on("error", done);
+    proc.on("close", function(code) {
+        done(null, code, Buffer.concat(output), Buffer.concat(error));
+    });
+
+    // return promised result
+    return result;
 }
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Array function binding
@@ -103,6 +172,7 @@ function unshifter(arr) {
 module.exports = {
     bucket: bucket,
     once: once,
+    supervise: supervise,
 
     popper: popper,
     pusher: pusher,

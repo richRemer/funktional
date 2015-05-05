@@ -1,7 +1,22 @@
 var Readable = require("stream").Readable,
+    spawn = require("child_process").spawn,
     expect = require("expect.js"),
     sinon = require("sinon"),
     fn = require("..");
+
+describe("once", function() {
+    describe("(function)", function() {
+        it("should only execute on first call", function() {
+            var spy = sinon.spy(),
+                onceFn = fn.once(spy);
+
+            onceFn();
+            onceFn();
+
+            expect(spy.calledOnce).to.be(true);
+        });
+    });
+});
 
 describe("bucket", function() {
     function createStream() {
@@ -38,16 +53,37 @@ describe("bucket", function() {
     });
 });
 
-describe("once", function() {
-    describe("(function)", function() {
-        it("should only execute on first call", function() {
-            var spy = sinon.spy(),
-                onceFn = fn.once(spy);
+describe("supervise", function() {
+    function createProc() {
+        return spawn("ls");
+    }
 
-            onceFn();
-            onceFn();
+    describe("(ChildProcess)", function() {
+        it("should supervise process and return Promise", function(done) {
+            var supervise = fn.supervise(createProc());
 
-            expect(spy.calledOnce).to.be(true);
+            expect(supervise.then).to.be.a("function");
+            supervise.then(function(result) {
+                expect(result).to.be.an("object");
+                expect(result.exit).to.be.a("number");
+                expect(result.stdout).to.be.a(Buffer);
+                expect(result.stderr).to.be.a(Buffer);
+                done();
+            }).catch(done);
+        });
+    });
+
+    describe("(ChildProcess, function)", function() {
+        it("should run proc and pass result to callback", function(done) {
+            fn.supervise(createProc(), function(err, exit, stdout, stderr) {
+                if (err) done(err);
+                else {
+                    expect(exit).to.be.a("number");
+                    expect(stdout).to.be.a(Buffer);
+                    expect(stderr).to.be.a(Buffer);
+                    done();
+                }
+            });
         });
     });
 });

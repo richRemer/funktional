@@ -34,6 +34,11 @@ Return a function which pushes its arguments onto the end of an array.
 ### shifter(array)
 Return a function which shifts values from the start of an array.
 
+### supervise(child_process.ChildProcess, [function])
+Supervise a child process, then pass result to the callback.  Alternatively,
+return a Promise for the process result.  Result includes exit status and the
+standard output and error streams.
+
 ### unshifter(array)
 Return a function which unshifts its arguments onto the start of an array.
 
