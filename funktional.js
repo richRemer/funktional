@@ -59,6 +59,20 @@ function promise(fn) {
     }
 }
 
+/**
+ * Create continuation passing style callback which passes results to 'resolve'
+ * function on success, or passes error to 'reject' function on error.
+ * @param {function} resolve
+ * @param {function} reject
+ * @returns {function}
+ */
+function razor(resolve, reject) {
+    return function(err) {
+        if (err) reject(err);
+        else resolve.apply(null, slice.call(arguments, 1));
+    };
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // Specialized event handlers
 //////////////////////////////////////////////////////////////////////////////
@@ -158,6 +172,7 @@ module.exports = {
     ok: ok,
     once: once,
     promise: promise,
+    razor: razor,
 
     bucket: bucket,
     supervise: supervise,

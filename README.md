@@ -38,6 +38,10 @@ Generate function which pops a value from an array when called.
 ### push(array) => function
 Generate function which pushes a value or values onto an array when called.
 
+### razor(function, function) => function
+Generate continuation passing style function which passes the results to the
+first function or the error to the second function.
+
 ### shift(array) => function
 Generate function which shifts values from an array when called.
 

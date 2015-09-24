@@ -49,6 +49,29 @@ describe("promise", function() {
     });
 });
 
+describe("razor", function() {
+    describe("(function, function)", function() {
+        it("should call first with result or second with error", function() {
+            var resolve, reject;
+
+            resolve = sinon.spy(function(a, b) {
+                expect(a).to.be(42);
+                expect(b).to.be(13);
+            });
+
+            reject = sinon.spy(function(err) {
+                expect(err).to.be.an(Error);
+            });
+
+            fn.razor(resolve, reject)(new Error("foo"));
+            fn.razor(resolve, reject)(null, 42, 13);
+
+            expect(resolve.calledOnce).to.be(true);
+            expect(reject.calledOnce).to.be(true);
+        });
+    });
+});
+
 describe("bucket", function() {
     function createStream() {
         var chunks = ["foo", "bar"];
