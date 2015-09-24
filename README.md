@@ -16,38 +16,38 @@ send("bar");    // does nothing
 Helper Functions
 ----------------
 
-### bucket(stream.Readable, [function])
-Read an entire stream, then pass the result to the callback.  Alternatively,
-return a Promise for the stream result.
+### bucket(stream.Readable, [function]) => Promise
+Read entire stream and concatenate results.  Callback accepts `(err, bucket)`,
+where `bucket` is the concatenated result.
 
-### ok(function)
-Return a new function that injects a null as the first argument.
+### ok(function) => function
+Wrap function to always insert `null` as the first argument.  Since the
+first argument is the `err` for continuation passing style, this has the
+effect of never generating an error.
 
-### once(function)
-Return a new function which calls the provided function the first time only.
-Subsequent calls to the new function will do nothing but return the original
-result.
+### once(function) => function
+Wrap function to only execute once, always returning the same result.
 
-### pledge(function)
-Return a new function with optional callback; if callback is not provided, the
-new function will return a Promise.
+### promise(function) => function
+Wrap continuation passing style function to return Promise and accept callback
+optionally.
 
-### popper(array)
-Return a function which pops values from the end of an array.
+### pop(array) => function
+Generate function which pops a value from an array when called.
 
-### pusher(array)
-Return a function which pushes its arguments onto the end of an array.
+### push(array) => function
+Generate function which pushes a value or values onto an array when called.
 
-### shifter(array)
-Return a function which shifts values from the start of an array.
+### shift(array) => function
+Generate function which shifts values from an array when called.
 
-### supervise(child_process.ChildProcess, [function])
-Supervise a child process, then pass result to the callback.  Alternatively,
-return a Promise for the process result.  Result includes exit status and the
-standard output and error streams.
+### supervise(child_process.ChildProcess, [function]) => Promise
+Supervise a child process and collect stdout and stderr data.  Callback
+accepts `(err, exit, stdout, stderr)`, where `exit` is the exit status, and
+`stdout` and `stderr` are the output streams data.
 
-### unshifter(array)
-Return a function which unshifts its arguments onto the start of an array.
+### unshift(array)
+Generate function which unshifts its arguments onto an array when called.
 
 Appendix: Async Callback Styles
 -------------------------------

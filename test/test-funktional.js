@@ -31,16 +31,16 @@ describe("once", function() {
     });
 });
 
-describe("pledge", function() {
+describe("promise", function() {
     describe("(function)", function() {
         it("should make callback optional; Promise instead", function(done) {
             var callback = function(a, b, done) {
                     done(null, a, b);
                 },
-                pledge = fn.pledge(callback),
-                promise = pledge(42, 13);
+                promise = fn.promise(callback),
+                result = promise(42, 13);
 
-            promise.then(function(result) {
+            result.then(function(result) {
                 expect(arguments.length).to.be(1);
                 expect(result).to.be(42);
                 done();
@@ -116,27 +116,27 @@ describe("supervise", function() {
     });
 });
 
-describe("popper", function() {
+describe("pop", function() {
     describe("(array)", function() {
         it("should remove and return values from end of array", function() {
             var arr = [0, 1, 2],
-                popper = fn.popper(arr);
+                pop = fn.pop(arr);
 
-            expect(popper()).to.be(2);
-            expect(popper()).to.be(1);
-            expect(popper()).to.be(0);
+            expect(pop()).to.be(2);
+            expect(pop()).to.be(1);
+            expect(pop()).to.be(0);
             expect(arr.length).to.be(0);
         });
     });
 });
 
-describe("pusher", function() {
+describe("push", function() {
     describe("(array)", function() {
         it("should add arguments to end of array", function() {
             var arr = [0],
-                pusher = fn.pusher(arr);
+                push = fn.push(arr);
 
-            pusher(1, 2);
+            push(1, 2);
             expect(arr.length).to.be(3);
             expect(arr[1]).to.be(1);
             expect(arr[2]).to.be(2);
@@ -144,27 +144,27 @@ describe("pusher", function() {
     });
 });
 
-describe("shifter", function() {
+describe("shift", function() {
     describe("(array)", function() {
         it("should remove and return values from start of array", function() {
             var arr = [0, 1, 2],
-                shifter = fn.shifter(arr);
+                shift = fn.shift(arr);
 
-            expect(shifter()).to.be(0);
-            expect(shifter()).to.be(1);
-            expect(shifter()).to.be(2);
+            expect(shift()).to.be(0);
+            expect(shift()).to.be(1);
+            expect(shift()).to.be(2);
             expect(arr.length).to.be(0);
         });
     });
 });
 
-describe("unshifter", function() {
+describe("unshift", function() {
     describe("(array)", function() {
         it("should add arguments to start of array", function() {
             var arr = [0],
-                unshifter = fn.unshifter(arr);
+                unshift = fn.unshift(arr);
 
-            unshifter(1, 2);
+            unshift(1, 2);
             expect(arr.length).to.be(3);
             expect(arr[0]).to.be(1);
             expect(arr[1]).to.be(2);

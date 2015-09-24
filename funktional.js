@@ -1,4 +1,5 @@
-var Promise = require("es6-promise").Promise;
+var Promise = require("es6-promise").Promise,
+    slice = Array.prototype.slice;
 
 //////////////////////////////////////////////////////////////////////////////
 // Utility wrappers
@@ -36,30 +37,25 @@ function once(fn) {
 }
 
 /**
- * Create updated function with the callback optional.  If the callback is not
- * provided, the function will return a Promise.
+ * Create updated function with optional callback and Promise return value.
  * @param {function} fn
  * @returns {function}
  */
-function pledge(fn) {
+function promise(fn) {
     return function() {
-        var resolver, rejecter,
-            result;
+        var context = this,
+            args = slice.call(arguments, 0),
+            done;
 
-        if (typeof arguments[arguments.length-1] !== "function") {
-            result = new Promise(function(resolve, reject) {
-                resolver = resolve;
-                rejecter = reject;
-            });
+        if (typeof args[args.length-1] === "function") done = args.pop();
 
-            Array.prototype.push.call(arguments, function(err, result) {
-                if (err) rejecter(err);
-                else resolver(result);
-            });
-        }
-
-        fn.apply(this, arguments);
-        return result;
+        return new Promise(function(resolve, reject) {
+            fn.apply(context, args.concat(function(err, val) {
+                try {done && done.apply(null, arguments);} catch (err) {}
+                if (err) reject(err);
+                else resolve(val);
+            }));
+        });
     }
 }
 
@@ -74,12 +70,12 @@ function pledge(fn) {
  * @param {function} [done]
  * @returns {Promise}
  */
-var bucket = pledge(function(stream, done) {
+var bucket = promise(function(stream, done) {
     var bucket = [];
 
     // read the stream and pass results to callback
     stream.on("error", done);
-    stream.on("data", pusher(bucket));
+    stream.on("data", push(bucket));
     stream.on("end", function() {
         var strings;
 
@@ -98,7 +94,7 @@ var bucket = pledge(function(stream, done) {
  * @param {function} [done]
  * @returns {Promise}
  */
-var supervise = pledge(function(proc, done) {
+var supervise = promise(function(proc, done) {
     var output = [],
         error = [];
 
@@ -106,8 +102,8 @@ var supervise = pledge(function(proc, done) {
     done = once(done);
 
     // collect buffered output
-    proc.stdout.on("data", pusher(output));
-    proc.stderr.on("data", pusher(error));
+    proc.stdout.on("data", push(output));
+    proc.stderr.on("data", push(error));
 
     // handle process and pass execution results to callback
     proc.on("error", done);
@@ -126,7 +122,7 @@ var supervise = pledge(function(proc, done) {
  * @param {array} arr
  * @returns {function}
  */
-function popper(arr) {
+function pop(arr) {
     return Array.prototype.pop.bind(arr);
 }
 
@@ -135,7 +131,7 @@ function popper(arr) {
  * @param {array} arr
  * @returns {function}
  */
-function pusher(arr) {
+function push(arr) {
     return Array.prototype.push.bind(arr);
 }
 
@@ -144,7 +140,7 @@ function pusher(arr) {
  * @param {array} arr
  * @returns {function}
  */
-function shifter(arr) {
+function shift(arr) {
     return Array.prototype.shift.bind(arr);
 }
 
@@ -153,7 +149,7 @@ function shifter(arr) {
  * @param {array} arr
  * @returns {function}
  */
-function unshifter(arr) {
+function unshift(arr) {
     return Array.prototype.unshift.bind(arr);
 }
 
@@ -161,13 +157,13 @@ function unshifter(arr) {
 module.exports = {
     ok: ok,
     once: once,
-    pledge: pledge,
+    promise: promise,
 
     bucket: bucket,
     supervise: supervise,
 
-    popper: popper,
-    pusher: pusher,
-    shifter: shifter,
-    unshifter: unshifter
+    pop: pop,
+    push: push,
+    shift: shift,
+    unshift: unshift
 };
